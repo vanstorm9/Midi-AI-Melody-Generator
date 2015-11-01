@@ -18,7 +18,7 @@ print 'Extracting all of pattern[1]'
 pat = midi.Pattern()
 
 #folder_trans = 'training-songs'
-folder_trans = 'training-wide-note'
+folder_trans = 'training-ground'
 #folder_trans = 'training-video-test'
 #folder_trans = 'training-kid-songs'
 #folder_trans = 'training-classical-songs'
