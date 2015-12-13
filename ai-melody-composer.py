@@ -219,6 +219,7 @@ i = 0
 time = 0
 prev_pitch_ar = np.array([])
 
+# Preform seeding (although seeding is not random, it seeds the original midi song)
 for (sample, target) in ds.getSequenceIterator(0):
     #print track_fi
 
