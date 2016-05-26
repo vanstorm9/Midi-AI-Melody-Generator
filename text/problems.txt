@@ -6,3 +6,4 @@
 	- Code currently chooses only certain tracks and ignore all of the others
 	- Probably the reason why songs like Suteki-Da-Ne works is because the track the code chooses happens to be complex enough (enough variety of notes)
 		- Possible soulution is to take multiple ticks, pitch, velocity tracks, increase input size of LSTM, and construct result.mid with n tracks.
+		- Or create algorithm that chooses track that has the highest note variety.
