@@ -10,3 +10,5 @@
 
 
 - Tested on Vocaloid songs, proved that training and learning needs improvement (spammed notes on a one-track song with enough note vareity (World is Mine)
+		- Or create algorithm that chooses track that has the highest note variety.
+
