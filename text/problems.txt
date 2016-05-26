@@ -1,0 +1,8 @@
+- Seems to only work well with certain songs like Suteki-Da-Ne (other songs results to spamming notes)
+- Matrix-mode is unsolved as Pybrain doesn't accept its matrix current format (only a list in one dimension)
+	- A possible solution is that it doesn't need matrix form, but a long list with random sampling of small intevals of notes across each song.	
+
+- Preservation of tracks in midi song in dataset is far from complete
+	- Code currently chooses only certain tracks and ignore all of the others
+	- Probably the reason why songs like Suteki-Da-Ne works is because the track the code chooses happens to be complex enough (enough variety of notes)
+		- Possible soulution is to take multiple ticks, pitch, velocity tracks, increase input size of LSTM, and construct result.mid with n tracks.

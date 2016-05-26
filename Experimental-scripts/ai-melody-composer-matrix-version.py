@@ -18,14 +18,17 @@ print 'Extracting all of pattern[1]'
 pat = midi.Pattern()
 
 #folder_trans = 'training-songs'
-folder_trans = 'training-ground'
+
+#folder_trans = 'training-ground'
+folder_trans = np.array(['training-ground'])
+
 #folder_trans = 'training-video-test'
 #folder_trans = 'training-kid-songs'
 #folder_trans = 'training-classical-songs'
-
+'''
 num_files = len([f for f in os.listdir(folder_trans)
                     if os.path.isfile(os.path.join(folder_trans, f))])
-
+'''
 #path_ar = ['Songs/twinkle_twinkle.mid', 'Songs/Suteki-Da-Ne.mid']
 
 def tick_to_time(tick):
@@ -45,80 +48,138 @@ def pitch_prev_array_add(pitch, pitch_ar):
 
 def tranverse_all_folders(folder_trans):
     j = 0
-    for path in os.listdir(folder_trans):
-        pattern = midi.read_midifile(folder_trans + slash + path)
-        print folder_trans + slash + path
-        # Instantiate a MIDI Track (contains a list of MIDI events)
-        track = midi.Track()
-        # Append the track to the pattern
-        pat.append(track)
-        # Goes through extracted song and reconstruct them (pattern[1])
-        '''
-        tr = 1
-        start_val = 1
-        i = 1
-        '''
-        # Grenade sample window
-        '''
-        tr = 5
-        start_val = 80
-        i = 80
-        '''
-        # Suteki Da Ne sample window
-        tr = 1
-        start_val = 1
-        i = 1
-        while True:
-            #if i > len(pattern[tr]) - 2:
-            if i > len(pattern[tr]) - 2:
-                break
-            tick = pattern[tr][i].tick
-            pitch = pattern[tr][i].data[0]
+    k = 0
+    skip = False
+    label_ar = np.array([])
+    while k < folder_trans.size:
+        
+        for path in os.listdir(folder_trans[k]):
+            #print path
+            pattern = midi.read_midifile(folder_trans[k] + slash + path)
+            print folder_trans[k] + slash + path
+            # Instantiate a MIDI Track (contains a list of MIDI events)
+            track = midi.Track()
+            # Append the track to the pattern
+            pat.append(track)
+            # Goes through extracted song and reconstruct them (pattern[1])
 
-            # Because some pattern[][].data does not have a second array element
-            if len(pattern[tr][i].data) == 2:
-                velocity = pattern[tr][i].data[1]
+
+            temp = np.array([k])
+            label_ar = np.concatenate((label_ar, temp))
+
+
+            # Midi file track information
+            tr = 0
+            start_val = 1
+            i = 1
+            limit = 1000
+
+
+
+            # To choose track that has enough notes
+            p = 0
+            exc = True
+
+            
+            while p < len(pattern):
+                if len(pattern[tr]) >= limit:
+                    exc = False
+                    break
+                tr = tr + 1
+                p = p + 1
+
+            if exc:
+                print "All of this song's tracks does not have enough notes"
+                quit()
+
+                
+            while True:
+
+                # This is the if statement to break out of loop
+                # Iterates to end of song or at a set number
+                #if i > len(pattern[tr]) - 2:
+                if i > limit:
+                    break
+                #print pattern[tr][i]
+         
+                
+                tick = pattern[tr][i].tick
+
+                #print pattern[tr][i].data
+                #print len(pattern[tr][i].data)
+                
+                
+                pitch = pattern[tr][i].data[0]
+
+                # Because some pattern[][].data does not have a second array element
+                if len(pattern[tr][i].data) == 2:
+                    velocity = pattern[tr][i].data[1]
+                else:
+                    velocity = 0
+                # Place all of tick, pitch, and velocity values in indiviudal vectors
+                
+                tick = np.array([tick])
+                pitch = np.array([pitch])
+                velocity = np.array([velocity])
+                if i == start_val:
+                    tick_ar = tick
+                    pitch_ar = pitch
+                    velocity_ar = velocity
+                else:
+                    tick_ar = np.concatenate((tick_ar, tick))
+                    pitch_ar = np.concatenate((pitch_ar, pitch))
+                    velocity_ar = np.concatenate((velocity_ar, velocity))
+                # To reconstruct the entire song in its (piano-like) original form
+                #track.append(midi.NoteOnEvent(tick= tick, channel=1, data=[pitch, velocity]))
+                i = i + 1
+            
+            #print tick_ar.shape
+            if skip:
+                j= j + 1
+                continue
+
+                
+            if j == 0:
+                tick_u_ar = tick_ar
+                velocity_u_ar = velocity_ar
+                pitch_u_ar = pitch_ar
+
+                tick_u_ar = np.array([tick_u_ar])
+                velocity_u_ar = np.array([velocity_u_ar])
+                pitch_u_ar = np.array([pitch_u_ar])
             else:
-                velocity = 0
-            # Place all of tick, pitch, and velocity values in indiviudal vectors
-            tick = np.array([tick])
-            pitch = np.array([pitch])
-            velocity = np.array([velocity])
-            if i == start_val:
-                tick_ar = tick
-                pitch_ar = pitch
-                velocity_ar = velocity
-            else:
-                tick_ar = np.concatenate((tick_ar, tick))
-                pitch_ar = np.concatenate((pitch_ar, pitch))
-                velocity_ar = np.concatenate((velocity_ar, tick))
-            # To reconstruct the entire song in its (piano-like) original form
-            #track.append(midi.NoteOnEvent(tick= tick, channel=1, data=[pitch, velocity]))
-            i = i + 1
-        j = j + 1
-    return pattern, tick_ar, velocity_ar, pitch_ar
+                
+                tick_u_ar = np.concatenate((tick_u_ar, tick_ar[None,:]))
+                pitch_u_ar = np.concatenate((pitch_u_ar, pitch_ar[None,:]))
+                velocity_u_ar = np.concatenate((velocity_u_ar, velocity_ar[None,:]))
+            j = j + 1
+
+        k = k + 1
+            
+    return pattern, tick_u_ar, velocity_u_ar, pitch_u_ar, label_ar
 
 
 
 
 # Go through all folders and form the matrix
-pattern, tick_ar, velocity_ar, pitch_ar = tranverse_all_folders(folder_trans)
+#pattern, tick_ar, velocity_ar, pitch_ar = tranverse_all_folders(folder_trans)
+pattern, tick_ar, velocity_ar, pitch_ar, label_ar = tranverse_all_folders(folder_trans)
 
-
+#print tick_ar.shape
+#exit()
 
 print 'Converting data to list. . .'
 
 # Extract the first 30 elements of the data vector, then convert to list
 
-window_len = 120
-#window_len = 70
+#window_len = 120
+window_len = 50
 
 tick_data = tick_ar[:window_len].tolist()
 pitch_data = pitch_ar[:window_len].tolist()
 velocity_data = velocity_ar[:window_len].tolist()
 
 print 'Data Converted'
-
 
 # Put time series into a supervised dataset, where the target for
 # each sample is the next sample
