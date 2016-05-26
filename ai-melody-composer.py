@@ -18,7 +18,8 @@ print 'Extracting all of pattern[1]'
 pat = midi.Pattern()
 
 #folder_trans = 'training-songs'
-folder_trans = 'training-ground'
+#folder_trans = 'training-ground'
+folder_trans = 'Vocaloid-Songs'
 #folder_trans = 'training-video-test'
 #folder_trans = 'training-kid-songs'
 #folder_trans = 'training-classical-songs'
@@ -58,20 +59,24 @@ def tranverse_all_folders(folder_trans):
         start_val = 1
         i = 1
         '''
-        # Grenade sample window
-        '''
-        tr = 5
-        start_val = 80
-        i = 80
+        # World is MIne sample window
+        
+        tr = 0
+        start_val = 14
+        i = 14
+        #print pattern
         '''
         # Suteki Da Ne sample window
         tr = 1
         start_val = 1
         i = 1
+        '''
         while True:
+            #print i
             #if i > len(pattern[tr]) - 2:
             if i > len(pattern[tr]) - 2:
                 break
+            #print pattern[tr][i]
             tick = pattern[tr][i].tick
             pitch = pattern[tr][i].data[0]
 
