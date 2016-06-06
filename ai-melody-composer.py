@@ -226,7 +226,7 @@ from sys import stdout
 print 'Starting to train neural network. . .'
 trainer = RPropMinusTrainer(net, dataset=ds)
 train_errors = []  # save errors for plotting later
-EPOCHS_PER_CYCLE = 2
+EPOCHS_PER_CYCLE = 5
 #CYCLES = 200
 CYCLES = 100
 EPOCHS = EPOCHS_PER_CYCLE * CYCLES

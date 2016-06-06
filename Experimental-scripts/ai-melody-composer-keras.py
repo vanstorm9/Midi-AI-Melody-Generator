@@ -18,8 +18,8 @@ print 'Extracting all of pattern[1]'
 pat = midi.Pattern()
 
 #folder_trans = 'training-songs'
-#folder_trans = 'training-ground'
-folder_trans = '../vocaloid-training-ground'
+folder_trans = '../training-ground'
+#folder_trans = '../vocaloid-training-ground'
 #folder_trans = 'training-video-test'
 #folder_trans = 'training-kid-songs'
 #folder_trans = 'training-classical-songs'
@@ -32,7 +32,7 @@ num_files = len([f for f in os.listdir(folder_trans)
 
 # since we are using stateful rnn tsteps can be set to 1
 tsteps = 1
-batch_size = 23
+batch_size = 1
 epochs = 30
 # number of elements ahead that are used to make the prediction
 lahead = 1
@@ -176,15 +176,16 @@ def tranverse_all_folders(folder_trans):
 # Go through all folders and form the matrix
 pattern, tick_ar, velocity_ar, pitch_ar = tranverse_all_folders(folder_trans)
 
-
-pitch_ar_out = np.expand_dims(pitch_ar, axis=1)
-pitch_ar = np.expand_dims(np.expand_dims(pitch_ar, axis=1), axis=1)
+temp_ar = pitch_ar
 
 
-print pitch_ar.shape
-print pitch_ar_out.shape
+temp_ar_out = np.expand_dims(temp_ar, axis=1)
+temp_ar = np.expand_dims(np.expand_dims(temp_ar, axis=1), axis=1)
+
+
+print temp_ar.shape
+print temp_ar_out.shape
 print 'Converting data to list. . .'
-
 
 
 
@@ -203,8 +204,8 @@ model.compile(loss='mse', optimizer='rmsprop')
 print('Training')
 for i in range(epochs):
     print('Epoch', i, '/', epochs)
-    model.fit(pitch_ar,
-              pitch_ar_out,
+    model.fit(temp_ar,
+              temp_ar_out,
               batch_size=batch_size,
               verbose=1,
               nb_epoch=1,
@@ -212,11 +213,11 @@ for i in range(epochs):
     model.reset_states()
 
 print('Predicting')
-predicted_output = model.predict(pitch_ar, batch_size=batch_size)
+predicted_output = model.predict(temp_ar, batch_size=batch_size)
 
 print('Ploting Results')
 plt.subplot(2, 1, 1)
-plt.plot(pitch_ar_out)
+plt.plot(temp_ar_out)
 plt.title('Expected')
 plt.subplot(2, 1, 2)
 plt.plot(predicted_output)
@@ -224,8 +225,107 @@ plt.title('Predicted')
 plt.show()
 
 
+# Start constructing the new song (Midiutil version)
+MyMIDI = MIDIFile(1)
+track = 0   
+time = 0
+MyMIDI.addTrackName(track,time,"Sample Track")
+tempo = 120
+MyMIDI.addTempo(track,time,tempo)
 
 
+
+i = 0
+prev_pitch_ar = np.array([])
+
+
+#duration = tick_n/5
+#volume = velocity_n
+
+z = 0
+channel = 0
+
+
+for pitch in predicted_output:
+    print 'pitch:'
+    print pitch
+    print ' '
+    print 'velocity'
+    print velocity_ar[z]
+
+    time = tick_to_time(tick_ar[z])
+    duration = tick_ar[z]/5
+
+    print 'duration'
+    print duration
+    
+    MyMIDI.addNote(track,channel,pitch_regulate(pitch),time,duration,velocity_regulate(velocity_ar[z]))
+    #MyMIDI.addNote(track,channel,pitch,time,duration,volume)  
+    z = z + 1
+    
+
+'''
+# Preform seeding (although seeding is not random, it seeds the original midi song)
+for (sample, target) in ds.getSequenceIterator(0):
+    #print track_fi
+
+
+    
+    pred_ar = net.activate(sample)
+
+    tick_n = tick_regulate(int(pred_ar[2]))
+    pitch_n = pitch_regulate(int(pred_ar[0]))
+    velocity_n = velocity_regulate(int(pred_ar[1]))
+
+
+
+
+    
+    if i == 0:    
+        prev_pitch_ar = pitch_prev_array_add(pitch_n, None)
+    else:
+        prev_pitch_ar = pitch_prev_array_add(pitch_n, prev_pitch_ar)
+    
+    
+    
+    #print '               sample = ', sample
+    print 'predicted next sample = ', pitch_n, ' ', velocity_n, ' ', tick_n 
+    #print '   actual next sample = ', target
+    print ''
+
+    # Part of code used to have generator predict based on its own prev notes
+    #prev_ac_ar = np.array([pitch_n, velocity_n, tick_n])
+    
+    
+    i = i + 1
+    
+
+    # Add a note. addNote expects the following information:
+
+    #duration = 1
+    #volume = 100
+    
+    track = 0
+    channel = 0
+    pitch = pitch_n
+    duration = tick_n/5 the opportunity.velocity_ar[z]velocity_ar[z]
+    volume = velocity_n
+
+    #time = tick_to_time(tick_n)
+    
+    time = tick_to_time(tick_n)
+    
+    MyMIDI.addNote(track,channel,pitch,time,duration,volume)           
+
+'''    
+
+
+binfile = open("result.mid", 'wb')
+MyMIDI.writeFile(binfile)
+binfile.close()
+print 'Finished writing Midi file'
+
+print 'Midi file was written'
 
 
 
