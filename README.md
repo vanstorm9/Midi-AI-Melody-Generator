@@ -1,25 +1,12 @@
 # Midi-AI-Melody-Generator
 Uses LSTM neural networks to compose new and original melodies by feeding it midi files
 
-Dependencies:
+## Dependencies
 
-1)Git clone the python-midi repository here:
+- [python-midi](https://github.com/vishnubob/python-midi): `pip install python-midi`
+- [MIDIUtil](https://code.google.com/p/midiutil): `pip install MIDIUtil`
+- [pybrain](http://pybrain.org/): `pip install pybrain`
 
-https://github.com/vishnubob/python-midi
+## Usage
 
-2) Download MIDIUtil from here:
-
-https://code.google.com/p/midiutil/downloads/detail?name=MIDIUtil-0.89.zip
-
-Unzip, then go into the main directory and execute:
-sudo python setup.py
-
-3) Download Pybrain as indicated here:
-
-http://pybrain.org/pages/download
-
-Git clone the repository, go into the main directory, then execute this command:
-
-sudo python setup.py install
-
-
+`python ai-melody-composer.py`
